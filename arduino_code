@@ -1,0 +1,82 @@
+//блок драйвера моторов
+#define ENA 10   
+#define IN1 9
+#define IN2 8
+#define IN3 7
+#define IN4 6
+#define ENB 5
+int sp = 255;
+
+//блок сервопривода
+#include <Servo.h>  
+#define gra 87
+#define pov 20
+Servo myservo1;
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(13, OUTPUT);
+  pinMode(ENA, OUTPUT); pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT);
+  pinMode(ENB, OUTPUT); pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT);
+  myservo1.attach(4);
+  myservo1.write(gra);
+}
+
+void loop() {
+
+  while (Serial.available() > 0) {
+    char  bl = Serial.read();
+
+    if (bl == '2') digitalWrite(13, 0);                 //индикация движения назад
+    if (bl == '5' or bl == '8') digitalWrite(13, 1);    //индикация движения вперед
+    
+    if (bl == '2') {    //движение назад
+      myservo1.write(gra);
+      digitalWrite(IN1, 1); digitalWrite(IN2, 0); analogWrite(ENA, sp);
+      digitalWrite(IN3, 1); digitalWrite(IN4, 0); analogWrite(ENB, sp);
+    }
+    
+    if (bl == '8') {    //движение вперед
+      myservo1.write(gra);
+      digitalWrite(IN1, 0); digitalWrite(IN2, 1); analogWrite(ENA, sp);
+      digitalWrite(IN3, 0); digitalWrite(IN4, 1); analogWrite(ENB, sp);
+    }
+    
+    if (bl == '1') {    //движение назад налево
+      myservo1.write(gra - pov);
+      digitalWrite(IN1, 1); digitalWrite(IN2, 0); analogWrite(ENA, sp);
+      digitalWrite(IN3, 1); digitalWrite(IN4, 0); analogWrite(ENB, sp);
+    }
+    
+    if (bl == '3') {    //движение назад направо
+      myservo1.write(gra + pov);
+      digitalWrite(IN1, 1); digitalWrite(IN2, 0); analogWrite(ENA, sp);
+      digitalWrite(IN3, 1); digitalWrite(IN4, 0); analogWrite(ENB, sp);
+    }
+    
+    if (bl == '7') {    //движение вперед налево
+      myservo1.write(gra - pov);
+      digitalWrite(IN1, 0); digitalWrite(IN2, 1); analogWrite(ENA, sp);
+      digitalWrite(IN3, 0); digitalWrite(IN4, 1); analogWrite(ENB, sp);
+    } 
+    
+    if (bl == '9') {    //движение вперед направо
+      myservo1.write(gra + pov);
+      digitalWrite(IN1, 0); digitalWrite(IN2, 1); analogWrite(ENA, sp);
+      digitalWrite(IN3, 0); digitalWrite(IN4, 1); analogWrite(ENB, sp);
+    }
+
+    if (bl == '5') {    // остановка
+      digitalWrite(IN1, 0); digitalWrite(IN2, 0); analogWrite(ENA, 0);
+      digitalWrite(IN3, 0); digitalWrite(IN4, 0); analogWrite(ENB, 0);
+      myservo1.write(gra);
+    }
+                        // повороты
+    if (bl == '4') { 
+      myservo1.write(gra+pov);
+    }
+    if (bl == '6') {
+     myservo1.write(gra-pov);
+    }
+  }
+}
